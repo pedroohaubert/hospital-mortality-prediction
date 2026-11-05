@@ -1,0 +1,431 @@
+{
+  "importancia_catboost": [
+    {
+      "feature": "sociodemografico3",
+      "importancia": 32.577119105853846,
+      "dp": 5.79333815847753
+    },
+    {
+      "feature": "sociodemografico4",
+      "importancia": 12.036081564447922,
+      "dp": 5.201318862983697
+    },
+    {
+      "feature": "sociodemografico5",
+      "importancia": 6.145769471719658,
+      "dp": 0.8662370900166761
+    },
+    {
+      "feature": "comorbidade5",
+      "importancia": 5.012703549491565,
+      "dp": 1.3176359390439307
+    },
+    {
+      "feature": "dadoclin3",
+      "importancia": 4.905381391743,
+      "dp": 0.8963272130691478
+    },
+    {
+      "feature": "comorbidade1",
+      "importancia": 4.513417674600375,
+      "dp": 1.0804819355697235
+    },
+    {
+      "feature": "dadoclin1",
+      "importancia": 4.027072383127202,
+      "dp": 0.4557708689046913
+    },
+    {
+      "feature": "dadoclin7",
+      "importancia": 3.120503308312791,
+      "dp": 0.4843572326253583
+    },
+    {
+      "feature": "comorbidade6",
+      "importancia": 2.895026195699958,
+      "dp": 0.7066256686132842
+    },
+    {
+      "feature": "comorbidade7",
+      "importancia": 2.418080697905641,
+      "dp": 0.5520075950314836
+    },
+    {
+      "feature": "dadoclin12",
+      "importancia": 2.288444673655003,
+      "dp": 0.8190500055439256
+    },
+    {
+      "feature": "dadoclin5",
+      "importancia": 2.255618388130148,
+      "dp": 0.5691610312861927
+    },
+    {
+      "feature": "dadoclin13",
+      "importancia": 2.033855456711558,
+      "dp": 0.5569456518953002
+    },
+    {
+      "feature": "sociodemografico1",
+      "importancia": 2.0256902160814447,
+      "dp": 0.9167726828132161
+    },
+    {
+      "feature": "dadoclin14",
+      "importancia": 1.9450836405166885,
+      "dp": 0.5319697589929709
+    },
+    {
+      "feature": "dadoclin9",
+      "importancia": 1.6420609978576581,
+      "dp": 0.5215667062602258
+    },
+    {
+      "feature": "dadoclin10",
+      "importancia": 1.567967917115583,
+      "dp": 0.5547282522444578
+    },
+    {
+      "feature": "dadoclin8",
+      "importancia": 1.446481093987128,
+      "dp": 0.5467281852228104
+    },
+    {
+      "feature": "dadoclin11",
+      "importancia": 1.4317044321427892,
+      "dp": 0.6304958975649039
+    },
+    {
+      "feature": "comorbidade2",
+      "importancia": 1.3589968159910615,
+      "dp": 0.46652779824057633
+    },
+    {
+      "feature": "dadoclin2",
+      "importancia": 1.2533300736652913,
+      "dp": 0.4414761020823311
+    },
+    {
+      "feature": "dadoclin6",
+      "importancia": 0.9800474039463309,
+      "dp": 0.47382814151366515
+    },
+    {
+      "feature": "dadoclin4",
+      "importancia": 0.9512833127993026,
+      "dp": 0.33599749489561315
+    },
+    {
+      "feature": "comorbidade4",
+      "importancia": 0.5499157683428058,
+      "dp": 0.25092930809001546
+    },
+    {
+      "feature": "sociodemografico2",
+      "importancia": 0.35017933573942345,
+      "dp": 0.1936321921002118
+    },
+    {
+      "feature": "comorbidade3",
+      "importancia": 0.26818513041582526,
+      "dp": 0.1403476914803951
+    }
+  ],
+  "coeficientes_binarios_logistica": [
+    {
+      "feature": "comorbidade1",
+      "coef_medio": 0.8325854400030493,
+      "dp": 0.09150254455543472,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin5",
+      "coef_medio": -0.7639952406579894,
+      "dp": 0.10069961546970069,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade7",
+      "coef_medio": 0.426418178949443,
+      "dp": 0.06485092214349478,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade3",
+      "coef_medio": -0.3322600881724732,
+      "dp": 0.0986533106002795,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade5",
+      "coef_medio": 0.33101556998710213,
+      "dp": 0.03318318976346324,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin3",
+      "coef_medio": -0.3279884678301583,
+      "dp": 0.04124374294575013,
+      "folds": 25
+    },
+    {
+      "feature": "sociodemografico2",
+      "coef_medio": -0.32016295800870315,
+      "dp": 0.10885008471806862,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade2",
+      "coef_medio": 0.284790788928405,
+      "dp": 0.09385999073083955,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin7",
+      "coef_medio": -0.2736994979637639,
+      "dp": 0.027047347148823134,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin1",
+      "coef_medio": -0.25186200736827763,
+      "dp": 0.026647450153107384,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin4",
+      "coef_medio": -0.251642211451556,
+      "dp": 0.08332505560160638,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin12",
+      "coef_medio": 0.17781506884323528,
+      "dp": 0.03414643465632314,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin14",
+      "coef_medio": -0.15932024963875357,
+      "dp": 0.04304485199032076,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade6",
+      "coef_medio": 0.14648810370825666,
+      "dp": 0.03671634594697491,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin2",
+      "coef_medio": 0.1244038787779664,
+      "dp": 0.07149908130742709,
+      "folds": 25
+    },
+    {
+      "feature": "comorbidade4",
+      "coef_medio": -0.11074303655560724,
+      "dp": 0.08189122732705799,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin13",
+      "coef_medio": -0.0958308004459652,
+      "dp": 0.03776645303301813,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin11",
+      "coef_medio": 0.05607415310062775,
+      "dp": 0.03653333713105739,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin10",
+      "coef_medio": 0.05549012288322785,
+      "dp": 0.04300686005497074,
+      "folds": 25
+    },
+    {
+      "feature": "sociodemografico1",
+      "coef_medio": 0.05435580063934502,
+      "dp": 0.02566753819519228,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin6",
+      "coef_medio": 0.03627691885570949,
+      "dp": 0.037358952775959485,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin8",
+      "coef_medio": -0.006728956618321981,
+      "dp": 0.027493110341511105,
+      "folds": 25
+    },
+    {
+      "feature": "dadoclin9",
+      "coef_medio": 0.003500950181593856,
+      "dp": 0.05419755568422497,
+      "folds": 25
+    }
+  ],
+  "referencias_categoricas": {
+    "sociodemografico4": [
+      "26"
+    ],
+    "sociodemografico5": [
+      "1"
+    ]
+  },
+  "curva_idade": [
+    {
+      "idade": 0.0,
+      "so_idade": 0.3013117828400206,
+      "logistica": 0.3398057048463119,
+      "catboost": 0.35486065392067223,
+      "ensemble": 0.34733317938349206
+    },
+    {
+      "idade": 5.0,
+      "so_idade": 0.28575464458477406,
+      "logistica": 0.3322171537479781,
+      "catboost": 0.32964508776513407,
+      "ensemble": 0.33093112075655606
+    },
+    {
+      "idade": 10.0,
+      "so_idade": 0.28807819777544624,
+      "logistica": 0.34083748015053367,
+      "catboost": 0.31357275212760843,
+      "ensemble": 0.32720511613907105
+    },
+    {
+      "idade": 15.0,
+      "so_idade": 0.3042189767213714,
+      "logistica": 0.36163180268783696,
+      "catboost": 0.3250108834798865,
+      "ensemble": 0.34332134308386175
+    },
+    {
+      "idade": 20.0,
+      "so_idade": 0.33089007261506465,
+      "logistica": 0.39069831028682495,
+      "catboost": 0.343765524980653,
+      "ensemble": 0.36723191763373897
+    },
+    {
+      "idade": 25.0,
+      "so_idade": 0.36450721816476833,
+      "logistica": 0.42366293708112757,
+      "catboost": 0.3934335629843423,
+      "ensemble": 0.4085482500327349
+    },
+    {
+      "idade": 30.0,
+      "so_idade": 0.40062575283610646,
+      "logistica": 0.45557412160490307,
+      "catboost": 0.49138107389095625,
+      "ensemble": 0.47347759774792963
+    },
+    {
+      "idade": 35.0,
+      "so_idade": 0.43426240564050045,
+      "logistica": 0.48147948756540293,
+      "catboost": 0.48946674916077076,
+      "ensemble": 0.4854731183630868
+    },
+    {
+      "idade": 40.0,
+      "so_idade": 0.46427997341856964,
+      "logistica": 0.5008368196178328,
+      "catboost": 0.49919541161671205,
+      "ensemble": 0.5000161156172724
+    },
+    {
+      "idade": 45.0,
+      "so_idade": 0.4929444260032724,
+      "logistica": 0.5166164694592427,
+      "catboost": 0.5207564079868389,
+      "ensemble": 0.5186864387230408
+    },
+    {
+      "idade": 50.0,
+      "so_idade": 0.5227559080993782,
+      "logistica": 0.5319326123309358,
+      "catboost": 0.5397322692241225,
+      "ensemble": 0.5358324407775292
+    },
+    {
+      "idade": 55.0,
+      "so_idade": 0.5561785081579271,
+      "logistica": 0.5498794018869667,
+      "catboost": 0.5599349237628026,
+      "ensemble": 0.5549071628248847
+    },
+    {
+      "idade": 60.0,
+      "so_idade": 0.5953324034220907,
+      "logistica": 0.5733853767515139,
+      "catboost": 0.5781328189747534,
+      "ensemble": 0.5757590978631337
+    },
+    {
+      "idade": 65.0,
+      "so_idade": 0.6401313566001551,
+      "logistica": 0.6038662585142686,
+      "catboost": 0.600563896585497,
+      "ensemble": 0.6022150775498828
+    },
+    {
+      "idade": 70.0,
+      "so_idade": 0.6882655412802171,
+      "logistica": 0.6411144827596045,
+      "catboost": 0.6501241252697645,
+      "ensemble": 0.6456193040146845
+    },
+    {
+      "idade": 75.0,
+      "so_idade": 0.7370549058808876,
+      "logistica": 0.6843078449380126,
+      "catboost": 0.7031428988885838,
+      "ensemble": 0.6937253719132982
+    },
+    {
+      "idade": 80.0,
+      "so_idade": 0.7832346134405072,
+      "logistica": 0.7308819605457081,
+      "catboost": 0.7551818348531716,
+      "ensemble": 0.7430318976994399
+    },
+    {
+      "idade": 85.0,
+      "so_idade": 0.8221511757099742,
+      "logistica": 0.7743804450327165,
+      "catboost": 0.7801609785817522,
+      "ensemble": 0.7772707118072344
+    },
+    {
+      "idade": 90.0,
+      "so_idade": 0.8511024618849146,
+      "logistica": 0.8095380121177466,
+      "catboost": 0.8304453924337624,
+      "ensemble": 0.8199917022757545
+    },
+    {
+      "idade": 95.0,
+      "so_idade": 0.8693315097493024,
+      "logistica": 0.8335717691431297,
+      "catboost": 0.8480304752287985,
+      "ensemble": 0.8408011221859641
+    },
+    {
+      "idade": 100.0,
+      "so_idade": 0.8765530524615656,
+      "logistica": 0.8450451236466668,
+      "catboost": 0.867147634269031,
+      "ensemble": 0.8560963789578488
+    }
+  ]
+}

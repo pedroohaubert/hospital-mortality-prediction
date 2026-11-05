@@ -1,0 +1,39 @@
+{
+  "limiar": 0.276163,
+  "regra": "Minimiza o p75 bootstrap da LR− entre limiares com pelo menos 8% previstos como 0 e F1 a no máximo 0.08 do máximo F1 na mesma grade. Empate: maior F1, maior especificidade, limiar maior. Nível aplicado: principal.",
+  "nivel": "principal",
+  "modelo": "ensemble",
+  "ponto_oof": {
+    "sensibilidade": 0.9688189845474614,
+    "especificidade": 0.14549483013293943,
+    "lr_neg": 0.21431012651135667,
+    "f1": 0.7431474230077257,
+    "taxa_prevista_0": 0.08006948831332912,
+    "taxa_prevista_1": 0.9199305116866708,
+    "tp": 3511.0,
+    "fn": 113.0,
+    "fp": 2314.0,
+    "tn": 394.0
+  },
+  "ponto_aninhado_media": {
+    "n_repeticoes": 5,
+    "sensibilidade_media": 0.9654525386313466,
+    "sensibilidade_min": 0.9608167770419426,
+    "sensibilidade_max": 0.9679911699779249,
+    "especificidade_media": 0.15672082717872968,
+    "especificidade_min": 0.1451255539143279,
+    "especificidade_max": 0.16802067946824226,
+    "lr_neg_media": 0.2205378410442871,
+    "lr_neg_min": 0.2073764100694654,
+    "lr_neg_max": 0.23320476433059234,
+    "f1_media": 0.7439221479404804,
+    "f1_min": 0.7418705645588392,
+    "f1_max": 0.7453984466432599,
+    "taxa_prevista_0_media": 0.08679722046746684,
+    "taxa_prevista_0_min": 0.0810170562223626,
+    "taxa_prevista_0_max": 0.09428300694883134,
+    "limiar_media": 0.27968819999999994,
+    "limiar_min": 0.276516,
+    "limiar_max": 0.282166
+  }
+}
