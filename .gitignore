@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+.DS_Store
+catboost_info/
+dist/
+
+# A base de treino não vai para o git. O regulamento não autoriza
+# republicar o arquivo, e os nomes foram trocados de propósito.
+data/*.csv
+data/*.parquet
+data/*.xlsx
+
+# Saídas pesadas ou locais. Métricas, figuras e oof.csv ficam versionados.
+artifacts/tmp/
+*.log
