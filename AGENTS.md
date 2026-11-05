@@ -18,6 +18,10 @@ uv run pytest
 
 `predict` must stay offline: no downloads, no refit, no threshold search. The threshold lives in `artifacts/modelo.joblib` and is copied in `artifacts/limiar.json`. Class 1 means the six-decimal probability written to the CSV is `>=` that threshold.
 
+## TabPFN
+
+An isolated experiment lives in `experiments/tabpfn`. It is not part of `uv sync` at the repo root and must not replace `artifacts/modelo.joblib`. Read `docs/agents/tabpfn-experiment.md`. The manifest stays `not_run` until a machine actually finishes the fits. Do not commit weights, the training CSV, or per-patient scores.
+
 ## Do not
 
 - Report a metric that is not in `artifacts/metrics.json` or that you just recomputed from `artifacts/oof.csv`. The README numbers are the committed run (seed 42, 5×5).
