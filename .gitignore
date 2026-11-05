@@ -19,3 +19,10 @@ data/*.xlsx
 # Saídas pesadas ou locais. Métricas, figuras e oof.csv ficam versionados.
 artifacts/tmp/
 *.log
+
+# Experimento TabPFN. Peso, CSV e previsão por paciente ficam na máquina.
+experiments/tabpfn/runs/
+experiments/tabpfn/weights/
+experiments/tabpfn/**/*.ckpt
+experiments/tabpfn/**/*.npy
+experiments/tabpfn/**/*.partial

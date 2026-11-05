@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agregado sanitizado do experimento TabPFN v2",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["status", "recommendation", "patient_level_outputs"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["not_run", "smoke_only", "complete", "baseline_not_reproduced"]
+    },
+    "device": { "type": "string", "enum": ["cpu", "mps"] },
+    "recommendation": {
+      "type": "object",
+      "required": ["decisao", "motivo"],
+      "properties": {
+        "decisao": { "type": "string", "enum": ["adopt", "reject", "inconclusive"] },
+        "motivo": { "type": "string" }
+      }
+    },
+    "patient_level_outputs": { "const": "local_only" },
+    "primary": {
+      "type": "object",
+      "properties": {
+        "bootstrap": { "type": "object" },
+        "delong": { "type": "object" },
+        "repeat_deltas": { "type": "array", "maxItems": 5 },
+        "repeat_note": { "type": "string" }
+      }
+    }
+  }
+}
