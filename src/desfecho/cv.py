@@ -35,21 +35,33 @@ def _noop(message: str) -> None:
     del message
 
 
-def run_training(df: pd.DataFrame, cfg: TrainConfig, log: LogFn = _noop) -> dict:
-    started = time.perf_counter()
-    y = df[TARGET_COL].to_numpy(dtype=int)
-    n = len(df)
+def official_splits(
+    n_rows: int,
+    y: np.ndarray,
+    cfg: TrainConfig | None = None,
+) -> list[tuple[np.ndarray, np.ndarray]]:
+    """Os mesmos 5×5 do treino entregue. A semente mora em TrainConfig."""
+    cfg = cfg or TrainConfig()
+    y = np.asarray(y)
     splitter = RepeatedStratifiedKFold(
         n_splits=cfg.n_splits,
         n_repeats=cfg.n_repeats,
         random_state=cfg.seed,
     )
+    return list(splitter.split(np.zeros(n_rows), y))
+
+
+def run_training(df: pd.DataFrame, cfg: TrainConfig, log: LogFn = _noop) -> dict:
+    started = time.perf_counter()
+    y = df[TARGET_COL].to_numpy(dtype=int)
+    n = len(df)
+    splits = official_splits(n, y, cfg)
     oof = {key: np.full((cfg.n_repeats, n), np.nan) for key in MODEL_KEYS}
     models = {key: [] for key in MODEL_KEYS}
     fold_rows = []
     cat_trees = []
 
-    for fold_id, (train_idx, valid_idx) in enumerate(splitter.split(np.zeros(n), y)):
+    for fold_id, (train_idx, valid_idx) in enumerate(splits):
         repeat, fold = divmod(fold_id, cfg.n_splits)
         fold_seed = cfg.seed + 10007 * repeat + 17 * fold
         x_train = df.iloc[train_idx]
