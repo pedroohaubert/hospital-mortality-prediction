@@ -17,7 +17,7 @@ Isto não é o teste de 1.605 linhas. Esse arquivo só sai no dia da competiçã
 
 A submissão usa a média simples da logística e do CatBoost. O limiar gravado no modelo é **0,276163**.
 
-No mesmo escore out-of-fold em que o limiar foi escolhido (leitura otimista): sensibilidade 0,969, especificidade 0,145, **LR− 0,214**, **F1 0,743**, com 8,0% dos casos previstos como cura. Quando o limiar de cada repetição é escolhido sem olhar essa repetição, a LR− média fica em **0,221** (0,207 a 0,233) e o F1 médio em **0,744**.
+No mesmo escore out-of-fold em que o limiar foi escolhido (leitura otimista): sensibilidade 0,969, especificidade 0,145, **LR− 0,214**, **F1 0,743**, com 8,0% dos casos previstos como cura. Trocar a repetição em que o corte é escolhido deu LR− média **0,221** e F1 **0,744**, ainda com os mesmos pacientes. Não é um intervalo independente.
 
 Os dois intervalos da AUC concordam. O desvio entre as cinco repetições é pequeno (0,001) porque cada repetição vê os mesmos 6.332 pacientes; ele não é a incerteza do teste. O arquivo `artifacts/metrics.json` tem as contas completas.
 

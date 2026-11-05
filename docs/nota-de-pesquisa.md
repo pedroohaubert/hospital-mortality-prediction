@@ -147,7 +147,7 @@ O que saiu, no escore out-of-fold do ensemble:
 
 O piso de 8% é que segurou. O F1 ficou 0,014 abaixo do máximo, dentro da folga de 0,08. Ir para sensibilidade 0,98 melhoraria a LR− em 0,025 neste OOF e deixaria a especificidade em 0,09. No teste, com 1.605 linhas e poucos verdadeiros negativos, isso chega perto do infinito da regra. Não mexi.
 
-O ponto 0,214 / 0,743 é otimista: o corte viu esses escores. Deixando cada repetição de fora na hora de escolher o corte e medindo nela, a LR− média foi **0,221** (mínimo 0,207, máximo 0,233) e o F1 médio **0,744**. O limiar único do arquivo continua 0,276163, escolhido na amostra toda. A matriz nesse corte: VP 3.511, FN 113, FP 2.314, VN 394.
+O ponto 0,214 / 0,743 é otimista: o corte viu esses escores. Deixar uma repetição de fora deu LR− média **0,221** (mínimo 0,207, máximo 0,233) e F1 médio **0,744**, mas a repetição deixada de fora ainda contém os mesmos pacientes. O rótulo deles entra na escolha do corte. Não chamo isso de validação aninhada. O limiar único do arquivo continua 0,276163. A matriz nesse corte: VP 3.511, FN 113, FP 2.314, VN 394.
 
 Para a banca, a frase é direta. O regulamento pede para não deixar óbito passar, então o corte é baixo. O freio de 8% existe para a especificidade não zerar num teste azarado. Não é um limiar de ambulatório.
 

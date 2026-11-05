@@ -14,7 +14,7 @@ Paired model comparisons use DeLong on the two mean-OOF score vectors (`comparac
 
 `ponto_oof` is sensitivity, specificity, LR−, and F1 at the shipped threshold on the same mean-OOF scores used to pick it. It is optimistic. Say so, matching `ponto_oof_aviso`.
 
-`ponto_aninhado_media` is the honest check: for each repeat, pick the threshold on the other repeats and score the held-out repeat. Report the mean LR− and F1 from there when someone asks how stable the cut is. The file that goes to the jury still uses the single full-sample threshold.
+`ponto_aninhado_media` is a bad name. Each repeat scores every patient, so choosing the threshold on the other repeats still uses the labels of the patients being scored. It is not patient-disjoint and it is not nested cross-validation. The shipped JSON keeps the old key. Treat that LR− and F1 as exploratory, same as `ponto_oof`. The single threshold in the bundle is still the one the submission uses. The patient bootstrap and DeLong intervals condition on the stored scores. They do not include refitting or model selection.
 
 LR− is `(1 - sensitivity) / specificity`. Specificity 0 must surface as non-finite, never as zero. F1 is `2 TP / (2 TP + FP + FN)`.
 
