@@ -9,7 +9,13 @@ sys.path.insert(0, str(ROOT / "experiments" / "tabpfn"))
 
 from desfecho.config import TrainConfig
 from desfecho.cv import official_splits
-from tabpfn_exp.compare import patient_bootstrap_delta, recommend, repeat_deltas
+from tabpfn_exp.compare import (
+    audit_threshold_patients,
+    patient_bootstrap_delta,
+    recommend,
+    repeat_deltas,
+    repeat_holdout_reuses_labels,
+)
 from tabpfn_exp.device import SmokeResult, select_device
 from tabpfn_exp.estimate import project_memory, project_runtime
 from tabpfn_exp.loop import run_folds
@@ -55,20 +61,18 @@ def test_bootstrap_reamostra_paciente_e_nao_usa_25_folds():
     assert min(deltas) > 0
 
 
-def test_decisao_nao_olha_fold_nem_faixa_de_empate():
-    adopted = recommend(
+def test_decisao_nao_adota_com_limiar_nem_com_auc_sozinha():
+    favoravel = recommend(
         measured=True,
         offline_ok=True,
         bootstrap_low=0.01,
         bootstrap_high=0.03,
         delong_low=0.005,
         delong_high=0.04,
-        nested_lr_candidate=0.20,
-        nested_lr_reference=0.21,
-        nested_f1_candidate=0.74,
-        nested_f1_reference=0.74,
     )
-    assert adopted["decisao"] == "adopt"
+    assert favoravel["decisao"] == "inconclusive"
+    assert favoravel["motivo"] == "auc_favoravel_limiar_apenas_exploratorio"
+    assert favoravel["limiar_entra_na_decisao"] is False
     covered = recommend(
         measured=True,
         offline_ok=True,
@@ -76,13 +80,18 @@ def test_decisao_nao_olha_fold_nem_faixa_de_empate():
         bootstrap_high=0.02,
         delong_low=-0.01,
         delong_high=0.02,
-        nested_lr_candidate=0.1,
-        nested_lr_reference=0.5,
-        nested_f1_candidate=0.9,
-        nested_f1_reference=0.4,
     )
     assert covered["decisao"] == "inconclusive"
     assert covered["motivo"] == "intervalo_cobre_zero"
+    pior = recommend(
+        measured=True,
+        offline_ok=True,
+        bootstrap_low=-0.05,
+        bootstrap_high=-0.01,
+        delong_low=-0.04,
+        delong_high=-0.01,
+    )
+    assert pior["decisao"] == "reject"
     offline = recommend(
         measured=True,
         offline_ok=False,
@@ -90,13 +99,28 @@ def test_decisao_nao_olha_fold_nem_faixa_de_empate():
         bootstrap_high=0.3,
         delong_low=0.2,
         delong_high=0.3,
-        nested_lr_candidate=0.1,
-        nested_lr_reference=0.2,
-        nested_f1_candidate=0.8,
-        nested_f1_reference=0.7,
     )
     assert offline["decisao"] == "reject"
-    assert recommend(measured=False, offline_ok=True, bootstrap_low=1, bootstrap_high=1, delong_low=1, delong_high=1, nested_lr_candidate=0, nested_lr_reference=0, nested_f1_candidate=1, nested_f1_reference=1)["decisao"] == "inconclusive"
+    assert recommend(
+        measured=False,
+        offline_ok=True,
+        bootstrap_low=1,
+        bootstrap_high=1,
+        delong_low=1,
+        delong_high=1,
+    )["decisao"] == "inconclusive"
+
+
+def test_corte_por_repeticao_reusa_o_rotulo_do_avaliado():
+    y = np.array([0, 1] * 50)
+    audit = audit_threshold_patients(y)
+    assert audit["repeat_holdout_disjoint"] is False
+    assert audit["repeat_holdout_eval_labels_also_used"] > 0
+    assert audit["group_holdout_disjoint"] is True
+    assert audit["group_models_trained_on_eval"] is True
+    overlap = repeat_holdout_reuses_labels(len(y))
+    assert overlap["disjunto"] is False
+    assert overlap["n_rotulos_reusados"] == len(y)
 
 
 def test_mps_que_falha_cai_para_cpu_com_o_erro():
@@ -143,6 +167,21 @@ def test_loop_retoma_fold_pronto(tmp_path: Path):
     second = run_folds(y, out=tmp_path, config_hash="h", predict_fold=predict, cfg=cfg, device="cpu", cpu_override=False)
     assert calls["n"] == 2
     assert np.allclose(first, second)
+
+
+def test_handoff_nao_leva_csv_nem_peso(tmp_path: Path):
+    import zipfile
+
+    from tabpfn_exp.cli import cmd_handoff
+
+    dest = tmp_path / "handoff.zip"
+    args = type("A", (), {"root": str(ROOT), "out": str(dest)})()
+    assert cmd_handoff(args) == 0
+    names = zipfile.ZipFile(dest).namelist()
+    assert "experiments/tabpfn/uv.lock" in names
+    assert "src/desfecho/cv.py" in names
+    assert "reference/baseline_aggregate.json" in names
+    assert not any(name.endswith((".csv", ".ckpt", ".npy", ".joblib")) for name in names)
 
 
 def test_pacote_entregue_nao_depende_de_tabpfn():

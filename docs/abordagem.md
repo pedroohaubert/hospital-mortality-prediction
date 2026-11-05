@@ -62,7 +62,7 @@ No escore out-of-fold do ensemble, quem amarrou foi o piso de 8%, não o F1. O l
 
 Dá para ir mais baixo. No alvo de sensibilidade 0,98 a LR− no OOF seria 0,189, mas só 5% sairiam como cura. Eu não afrouxei o piso depois de ver a tabela. Afrouxar agora seria usar o resultado para reescrever a regra.
 
-Esse ponto do OOF é otimista, porque o corte foi escolhido nele. Por isso eu repeti a escolha deixando uma repetição de fora e medi nela. A LR− média dessas cinco provas foi 0,221, e o F1 médio 0,744. É esse par que eu levaria para uma conversa honesta. O limiar que vai no arquivo, porém, é um só, o da amostra inteira: 0,276163.
+Esse ponto do OOF é otimista, porque o corte foi escolhido nele. Repetir a escolha em outra repetição deu LR− 0,221 e F1 0,744, mas cada repetição cobre os mesmos pacientes. O rótulo de quem é medido também entrou na escolha. Não é um corte independente. O limiar que vai no arquivo continua um só, o da amostra inteira, 0,276163.
 
 Na hora de prever o teste eu não retreino em 100% dos dados. A probabilidade é a média dos modelos dos folds, que é a família de modelo em que o limiar foi calibrado. Retreinar em tudo mudaria um pouco a escala e o corte deixaria de ser o mesmo objeto.
 

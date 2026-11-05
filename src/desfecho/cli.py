@@ -145,7 +145,7 @@ def evaluate(
     nested = metrics.get("ponto_aninhado_media")
     if nested:
         console.print(
-            "Ponto com limiar escolhido fora da repetição avaliada: "
+            "Outra repetição, os mesmos pacientes (não é corte disjunto): "
             f"LR− média {nested['lr_neg_media']:.4f} "
             f"(mín {nested['lr_neg_min']:.4f}, máx {nested['lr_neg_max']:.4f}), "
             f"F1 média {nested['f1_media']:.4f}."

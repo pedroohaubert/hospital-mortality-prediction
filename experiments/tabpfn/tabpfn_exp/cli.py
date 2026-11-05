@@ -36,13 +36,44 @@ from tabpfn_exp.sanitize import sanitize
 from tabpfn_exp.weights import fetch_weight, verify_weight
 
 HANDOFF_FILES = [
+    "pyproject.toml",
+    "src/desfecho/__init__.py",
     "experiments/tabpfn/README.md",
     "experiments/tabpfn/PROTOCOLO.md",
     "experiments/tabpfn/manifest.json",
     "experiments/tabpfn/pyproject.toml",
+    "experiments/tabpfn/uv.lock",
     "experiments/tabpfn/schema/aggregate_result.schema.json",
     "docs/agents/tabpfn-experiment.md",
+    "docs/agents/evaluation.md",
 ]
+
+
+def _baseline_reference(root: Path) -> dict:
+    path = root / "artifacts" / "metrics.json"
+    if not path.is_file():
+        return {"status": "ausente", "nota": "Gere localmente com desfecho train. Não há oof no pacote."}
+    metrics = json.loads(path.read_text(encoding="utf-8"))
+    models = {}
+    for name, block in metrics.get("modelos", {}).items():
+        models[name] = {
+            "auc_media_oof": block.get("auc_media_oof"),
+            "auc_bootstrap_ic95": block.get("auc_bootstrap_ic95"),
+            "auc_delong_ic95": block.get("auc_delong_ic95"),
+            "brier": block.get("brier"),
+            "calibracao_slope": block.get("calibracao_slope"),
+            "calibracao_intercepto": block.get("calibracao_intercepto"),
+        }
+    return {
+        "papel": "agregado_publicado",
+        "limiar_papel": "exploratorio_mesmos_pacientes",
+        "modelo_submissao": metrics.get("modelo_submissao"),
+        "limiar": metrics.get("limiar"),
+        "ponto_oof": metrics.get("ponto_oof"),
+        "ponto_repeticao_nao_disjunto": metrics.get("ponto_aninhado_media"),
+        "modelos": models,
+        "oof_csv": "nao_incluido_regenere_localmente",
+    }
 
 
 def _dump(path: Path, payload: dict) -> None:
@@ -183,13 +214,14 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 def _full_run(args: argparse.Namespace, smoke: dict) -> int:
     from desfecho.config import TrainConfig
+    from desfecho.cv import official_splits
     from desfecho.data import load_table
     from desfecho.models import fresh_catboost, make_logistic
     from tabpfn_exp.backend import fit_predict
     from tabpfn_exp.compare import (
         calibration_block,
         delong_delta,
-        nested_operating_point,
+        exploratory_operating_points,
         patient_bootstrap_delta,
         recommend,
         repeat_deltas,
@@ -274,12 +306,16 @@ def _full_run(args: argparse.Namespace, smoke: dict) -> int:
     boot = patient_bootstrap_delta(y, tabpfn.mean(axis=0), ensemble.mean(axis=0), n_boot=N_BOOT, seed=cfg.seed)
     delong = delong_delta(y, tabpfn.mean(axis=0), ensemble.mean(axis=0))
     deltas = repeat_deltas(y, tabpfn, ensemble)
-    nested_tab = nested_operating_point(
-        y, tabpfn, n_boot=max(80, cfg.threshold_boot // 2), seed=cfg.seed, min_neg_rate=cfg.min_neg_rate, f1_margin=cfg.f1_margin
-    )
-    nested_ref = nested_operating_point(
-        y, ensemble, n_boot=max(80, cfg.threshold_boot // 2), seed=cfg.seed, min_neg_rate=cfg.min_neg_rate, f1_margin=cfg.f1_margin
-    )
+    groups = [valid for _, valid in official_splits(len(y), y, cfg)[: cfg.n_splits]]
+    threshold_kwargs = {
+        "n_boot": max(80, cfg.threshold_boot // 2),
+        "seed": cfg.seed,
+        "min_neg_rate": cfg.min_neg_rate,
+        "f1_margin": cfg.f1_margin,
+        "eval_groups": groups,
+    }
+    exploratorio_tab = exploratory_operating_points(y, tabpfn, **threshold_kwargs)
+    exploratorio_ref = exploratory_operating_points(y, ensemble, **threshold_kwargs)
     decision = recommend(
         measured=True,
         offline_ok=True,
@@ -287,10 +323,6 @@ def _full_run(args: argparse.Namespace, smoke: dict) -> int:
         bootstrap_high=float(boot["ic95_sup"]),
         delong_low=float(delong["ic95_inf"]),
         delong_high=float(delong["ic95_sup"]),
-        nested_lr_candidate=nested_tab["lr_neg_media"],
-        nested_lr_reference=nested_ref["lr_neg_media"],
-        nested_f1_candidate=nested_tab["f1_media"],
-        nested_f1_reference=nested_ref["f1_media"],
     )
     report = {
         "status": "complete",
@@ -308,8 +340,16 @@ def _full_run(args: argparse.Namespace, smoke: dict) -> int:
             "repeat_delta_mean": float(np.mean(deltas)),
             "repeat_note": "Cinco diferenças dependentes. Não é intervalo de confiança.",
         },
-        "nested_tabpfn": {k: v for k, v in nested_tab.items() if k != "por_repeticao"},
-        "nested_ensemble": {k: v for k, v in nested_ref.items() if k != "por_repeticao"},
+        "limiar_exploratorio_tabpfn": {
+            key: value
+            for key, value in exploratorio_tab.items()
+            if key != "por_repeticao"
+        },
+        "limiar_exploratorio_ensemble": {
+            key: value
+            for key, value in exploratorio_ref.items()
+            if key != "por_repeticao"
+        },
         "calibration_tabpfn": calibration_block(y, tabpfn.mean(axis=0)),
         "calibration_ensemble": calibration_block(y, ensemble.mean(axis=0)),
         "secondary_three_mean_auc_delta": float(
@@ -319,16 +359,8 @@ def _full_run(args: argparse.Namespace, smoke: dict) -> int:
         "recommendation": decision,
         "patient_level_outputs": "local_only",
     }
-    # O exploratório fica no disco local, fora do agregado sanitizado que a decisão usa.
-    local = dict(report)
-    local["exploratory_threshold_tabpfn"] = nested_tab["exploratorio"]
-    local["exploratory_threshold_ensemble"] = nested_ref["exploratorio"]
-    _dump(out / "aggregate_local.json", sanitize(local))
-    public = dict(report)
-    public["nested_tabpfn"].pop("exploratorio", None)
-    public["nested_ensemble"].pop("exploratorio", None)
-    _dump(out / "aggregate.json", sanitize(public))
-    print(json.dumps(sanitize(public), ensure_ascii=False, indent=2))
+    _dump(out / "aggregate.json", sanitize(report))
+    print(json.dumps(sanitize(report), ensure_ascii=False, indent=2))
     return 0
 
 
@@ -336,23 +368,55 @@ def cmd_handoff(args: argparse.Namespace) -> int:
     root = Path(args.root).resolve()
     dest = Path(args.out)
     dest.parent.mkdir(parents=True, exist_ok=True)
+    forbidden = {".csv", ".ckpt", ".npy", ".joblib"}
     with zipfile.ZipFile(dest, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for rel in HANDOFF_FILES:
             path = root / rel
             if not path.is_file():
                 raise FileNotFoundError(rel)
             archive.write(path, arcname=rel)
-        base = root / "experiments" / "tabpfn" / "tabpfn_exp"
-        for path in sorted(base.rglob("*.py")):
-            archive.write(path, arcname=str(path.relative_to(root)))
+        for folder in (root / "src" / "desfecho", root / "experiments" / "tabpfn" / "tabpfn_exp"):
+            for path in sorted(folder.rglob("*.py")):
+                if path.name == "__init__.py" and folder.name == "desfecho" and rel_already(path, root, HANDOFF_FILES):
+                    continue
+                archive.write(path, arcname=str(path.relative_to(root)))
         archive.writestr(
-            "LEIA.txt",
-            "Pacote sem CSV, sem peso e sem previsão por paciente.\n"
-            f"Código {CODE_LICENSE}. Pesos {WEIGHT_LICENSE} em {WEIGHT_LICENSE_URL}.\n"
-            f"Baixar só com tabpfn-exp fetch. URL {HF_FILE_URL}\n",
+            "reference/baseline_aggregate.json",
+            json.dumps(_baseline_reference(root), ensure_ascii=False, indent=2) + "\n",
         )
+        archive.writestr("LEIA.txt", _leia())
+        names = archive.namelist()
+    bad = [name for name in names if Path(name).suffix in forbidden or "oof" in name]
+    if bad:
+        dest.unlink(missing_ok=True)
+        raise RuntimeError(f"Pacote com dado de paciente: {bad}")
     print(dest)
     return 0
+
+
+def rel_already(path: Path, root: Path, listed: list[str]) -> bool:
+    return str(path.relative_to(root)) in listed
+
+
+def _leia() -> str:
+    return (
+        "Raiz do zip é a raiz do repositório.\n"
+        "Não há CSV, peso, oof.csv nem modelo.joblib.\n"
+        "Código do pacote tabpfn é Apache-2.0. O peso v2 é priorlabs-1-1.\n"
+        f"Fetch sem token. {HF_FILE_URL}\n"
+        "1. cd experiments/tabpfn && uv sync\n"
+        "2. uv run tabpfn-exp fetch --dest weights\n"
+        "3. uv run --offline tabpfn-exp run --weights weights/"
+        f"{WEIGHT_FILENAME} --out runs/oficial "
+        "--data ../../data/final_treino_val.csv\n"
+        "4. Isso para no smoke. Leia runs/oficial/smoke.json.\n"
+        "5. Só então repita o comando com --confirm-full-run.\n"
+        "Opcional, oof local, sem upload:\n"
+        "   uv run --project . desfecho train --data data/final_treino_val.csv --out /tmp/baseline-local\n"
+        "   e passe --baseline-oof /tmp/baseline-local/oof.csv\n"
+        "Retomar um fit interrompido é o mesmo comando com --confirm-full-run.\n"
+        f"Licença do código {CODE_LICENSE}. Licença do peso {WEIGHT_LICENSE} {WEIGHT_LICENSE_URL}.\n"
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:

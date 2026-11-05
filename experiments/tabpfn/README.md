@@ -8,7 +8,7 @@ O modelo entregue continua o ensemble de logística e CatBoost. Este diretório 
 
 ## O que está congelado
 
-A pergunta é se o TabPFN **v2** melhora o ensemble já entregue, no mesmo 5×5, com peso local e sem rede na hora de prever. A regra de adotar, rejeitar ou ficar inconclusivo está em `PROTOCOLO.md` e no código `recommend`. Ela não usa a faixa de empate de 0,010 nem a AUC do melhor fold.
+A pergunta é se o TabPFN **v2** melhora o ensemble já entregue, no mesmo 5×5, com peso local e sem rede na hora de prever. A regra está em `PROTOCOLO.md`. Ela não adota sozinha. LR− e F1 são exploração, porque o corte por repetição reusa o rótulo dos mesmos pacientes. A faixa de 0,010 e o melhor fold não entram.
 
 ## O que eu conferi no pacote, sem rodar o modelo
 
@@ -39,7 +39,15 @@ uv run --offline tabpfn-exp run \
 
 Esse `run` faz o smoke, grava `runs/oficial/smoke.json` e para. O JSON traz o device que de fato passou no fit minúsculo, o tempo, o pico de RSS e uma projeção linear das 25 idas. A projeção não é medição. A memória do fold cheio fica sem número.
 
-Se o tempo couber, o mesmo comando ganha `--confirm-full-run`. Aí sim são 25 fits de TabPFN e o refit das baselines, nos mesmos folds. Dá para interromper e rodar de novo. Fold com `status: done` e o mesmo `config_hash` não repete.
+Se o tempo couber, o mesmo comando ganha `--confirm-full-run`. Aí sim são 25 fits de TabPFN e o refit das baselines, nos mesmos folds. Dá para interromper e rodar de novo o mesmo comando com `--confirm-full-run`. Fold com `status: done` e o mesmo `config_hash` não repete.
+
+O `oof.csv` publicado não vai no zip. Sem `--baseline-oof`, o contraste usa o refit local. Para checar contra o arquivo antigo, gere outro só na máquina.
+
+```bash
+uv run --project . desfecho train --data data/final_treino_val.csv --out /tmp/baseline-local
+```
+
+Passe `--baseline-oof /tmp/baseline-local/oof.csv`. Não suba esse arquivo.
 
 O agregado sem paciente fica em `runs/oficial/aggregate.json`. Probabilidade por linha fica em `runs/` e não vai para o git.
 

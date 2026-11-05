@@ -4,15 +4,16 @@ Preparation only. No Mac run, no MPS measurement, no AUC gain. `experiments/tabp
 
 ## Frozen comparison
 
-`desfecho.cv.official_splits` is the 5×5 used by training (`TrainConfig` seed 42). The validation-index sha256 for the 6,332-row file is in the manifest. `recommend` in `tabpfn_exp.compare` is the only adopt / reject / inconclusive rule. It reads the patient-level paired AUC delta of TabPFN v2 minus the shipped ensemble. It does not read fold AUCs, the 0.010 tie band, or the three-model mean.
+`desfecho.cv.official_splits` is the 5×5 used by training (`TrainConfig` seed 42). The validation-index sha256 for the 6,332-row file is in the manifest. `recommend` reads only the patient-level paired AUC delta of TabPFN v2 minus the shipped ensemble. It does not read fold AUCs, the 0.010 tie band, the three-model mean, or LR−/F1.
+
+Protocol version 2, set before any TabPFN scores exist. Holding out a repeated-CV repeat does not hold out patients. `audit_threshold_patients` shows the label intersection and that the models which scored the selection patients were trained on the evaluation group. A label-disjoint group cut is still exploratory for that reason. True nesting would be 5 outer groups times 25 inner fits (125 TabPFN fits) and is not scheduled. `recommend` never returns `adopt`. A favorable AUC interval stays `inconclusive` with reason `auc_favoravel_limiar_apenas_exploratorio`.
 
 Uncertainty:
 
-- Patient bootstrap and DeLong are both conditional on the averaged out-of-fold scores. They are not a sample of 25 folds.
+- Patient bootstrap and DeLong condition on the stored scores. They do not refit models and do not redo model selection. They are not a sample of 25 folds.
 - The five repeat-wise AUC deltas are dependent. Report min, mean, and max. Do not turn them into a t interval.
 - If the two intervals disagree about covering zero, the decision is inconclusive.
 - The shipped ensemble was selected on this same out-of-fold table. The contrast is against the delivered model. That optimism is labeled, not corrected.
-- Nested threshold metrics are confirmatory. A threshold fit on all repeats is exploratory and is stripped from `aggregate.json`.
 
 A fresh baseline refit must match `artifacts/oof.csv` column `p_ensemble` within 1e-4 in ID order. Otherwise stop with `baseline_nao_reproduzida`.
 

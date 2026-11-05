@@ -14,7 +14,7 @@
       "type": "object",
       "required": ["decisao", "motivo"],
       "properties": {
-        "decisao": { "type": "string", "enum": ["adopt", "reject", "inconclusive"] },
+        "decisao": { "type": "string", "enum": ["reject", "inconclusive"] },
         "motivo": { "type": "string" }
       }
     },

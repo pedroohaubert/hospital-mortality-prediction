@@ -6,7 +6,7 @@ depois de ver a AUC.
 
 from __future__ import annotations
 
-PROTOCOL_VERSION = "1"
+PROTOCOL_VERSION = "2"
 
 # O pacote no PyPI, não o default interno (v3.5).
 TABPFN_VERSION = "9.2.0"
@@ -35,9 +35,12 @@ REFERENCE = "ensemble_entregue"
 SECONDARY_CANDIDATE = "media_tres"
 
 N_BOOT = 2000
+# Estas folgas descrevem o ponto exploratório. Não autorizam adoção.
 LR_NEG_WORSE_TOLERANCE = 0.02
 F1_WORSE_TOLERANCE = 0.02
 BASELINE_ATOL = 1e-4
+# CV aninhada de verdade seria 5 grupos externos vezes os 25 fits internos.
+NESTED_FIT_COUNT = 5 * 25
 
 CODE_LICENSE = "Apache-2.0"
 WEIGHT_LICENSE = "priorlabs-1-1"

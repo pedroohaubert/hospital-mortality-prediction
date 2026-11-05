@@ -31,22 +31,23 @@ A escolha antiga do ensemble entregue olhou este mesmo out-of-fold. O contraste 
 
 ## Limiar
 
-O ponto que entra na decisão é o aninhado. O corte de cada repetição é escolhido nas outras quatro e medido na que ficou de fora, com a mesma regra do treino entregue (p75 da LR−, pelo menos 8% previstos como 0, F1 a no máximo 0,08 do melhor F1).
+Correção da versão 2, antes de existir escore de TabPFN. Segurar uma repetição não separa pacientes. Cada repetição pontua os 6.332. O corte “da outra repetição” usa o rótulo de quem depois é medido. Isso não é validação aninhada.
 
-O corte escolhido na média de todas as repetições é exploratório. Ele vai para `aggregate_local.json` e não entra em `recommend`.
+Dá para escolher o corte só com os rótulos de fora de um grupo. Os folds da primeira repetição formam esses grupos. Aí o rótulo do grupo não entra na escolha. O escore de quem fica de fora, porém, veio de modelo que treinou nesse grupo. Tirar essa influência exige treinar de novo sem o grupo. Com 5 grupos externos e os 25 fits internos, seriam 125 fits de TabPFN, fora do orçamento desta rodada.
+
+LR− e F1 ficam no agregado com `papel: exploratorio` e `entra_na_decisao: false`. Não há adoção automática. AUC favorável com checksum ok continua inconclusiva, motivo `auc_favoravel_limiar_apenas_exploratorio`. Rejeição automática só ocorre se o peso falha ou se os dois intervalos de AUC ficam abaixo de zero.
 
 ## Decisão
 
-`recommend` só vê o contraste TabPFN menos ensemble.
+`recommend` só vê o contraste de AUC, TabPFN menos ensemble. As folgas de 0,02 em LR− e F1 ficaram no código como descrição antiga e não abrem adoção.
 
 - Inconclusivo se ainda não mediu, se falta intervalo, ou se bootstrap e DeLong discordam sobre o zero.
 - Rejeita se o peso não confere ou a inferência não ficou offline.
 - Rejeita se os dois intervalos ficam inteiros abaixo de zero.
-- Inconclusivo se os intervalos cobrem o zero, mesmo com a média das repetições bonita.
-- Se os intervalos ficam acima de zero, ainda olha o ponto aninhado. LR− do TabPFN pode ser até 0,02 pior que a do ensemble. F1 pode ser até 0,02 pior. Fora disso, inconclusivo.
-- Adota só se os intervalos ficam acima de zero, o ponto aninhado cabe na tolerância e o checksum offline passou.
+- Inconclusivo se os intervalos cobrem o zero.
+- Inconclusivo também se os dois ficam acima de zero. O limiar que decidiria a LR− não é disjunto.
 
-A faixa de 0,010 do ranking não é argumento. A AUC de um fold também não.
+Bootstrap e DeLong reamostram pacientes com o escore já pronto. Não reamostram o treino. A faixa de 0,010 do ranking não é argumento. A AUC de um fold também não.
 
 ## Custo e device
 

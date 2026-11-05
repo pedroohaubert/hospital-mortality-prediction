@@ -230,7 +230,11 @@ def _choose_shipped(aucs: dict[str, float], cfg: TrainConfig) -> tuple[str, str]
 
 
 def _nested_threshold(y: np.ndarray, oof: dict[str, np.ndarray], shipped: str, cfg: TrainConfig) -> list[dict]:
-    """Limiar escolhido nas outras repetições e medido na repetição deixada de fora."""
+    """Outra repetição, os mesmos pacientes.
+
+    Cada repetição cobre todo mundo. O corte usa o rótulo de quem depois é medido.
+    Não é validação aninhada nem disjunta. O nome antigo ficou no JSON entregue.
+    """
     rows = []
     n_repeats = cfg.n_repeats
     if n_repeats < 2:
