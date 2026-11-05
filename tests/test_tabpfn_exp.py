@@ -17,6 +17,7 @@ from tabpfn_exp.compare import (
     repeat_holdout_reuses_labels,
 )
 from tabpfn_exp.device import SmokeResult, select_device
+from tabpfn_exp.gates import decide, parse_vm_stat
 from tabpfn_exp.estimate import project_memory, project_runtime
 from tabpfn_exp.loop import run_folds
 from tabpfn_exp.protocol import N_FITS, SPLIT_INDEX_SHA256, TABPFN_VERSION
@@ -132,6 +133,20 @@ def test_mps_que_falha_cai_para_cpu_com_o_erro():
     assert decision.selected == "cpu"
     assert "mps" in decision.reason
     assert decision.smoke_mps.error == "mps_oob"
+
+
+def test_portao_de_disco_e_de_ram():
+    gib = 1024**3
+    ok = decide(stage="install", free_bytes=14 * gib, total_ram_bytes=16 * gib, available_ram_bytes=8 * gib)
+    assert ok["ok"] is True
+    assert ok["peak_is_measurement"] is False
+    tight = decide(stage="install", free_bytes=6 * gib, total_ram_bytes=16 * gib, available_ram_bytes=8 * gib)
+    assert tight["ok"] is False
+    full = decide(stage="full_run", free_bytes=14 * gib, total_ram_bytes=16 * gib, available_ram_bytes=5 * gib)
+    assert full["ok"] is False
+    assert full["reason"] == "ram_disponivel_abaixo_de_6gib"
+    text = "Pages free: 100.\nPages inactive: 50.\nPages speculative: 25.\n"
+    assert parse_vm_stat(text, 16384) == 175 * 16384
 
 
 def test_projecao_sem_smoke_nao_inventa_tempo():

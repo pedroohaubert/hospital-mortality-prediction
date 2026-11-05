@@ -36,8 +36,11 @@ from tabpfn_exp.sanitize import sanitize
 from tabpfn_exp.weights import fetch_weight, verify_weight
 
 HANDOFF_FILES = [
+    "README.md",
     "pyproject.toml",
     "src/desfecho/__init__.py",
+    "experiments/tabpfn/.python-version",
+    "experiments/tabpfn/preflight.py",
     "experiments/tabpfn/README.md",
     "experiments/tabpfn/PROTOCOLO.md",
     "experiments/tabpfn/manifest.json",
@@ -186,7 +189,27 @@ def cmd_estimate(args: argparse.Namespace) -> int:
     return 0 if projected["status"] == "projected" else 1
 
 
+def _gate(args: argparse.Namespace) -> int:
+    from tabpfn_exp.gates import enforce
+
+    target = Path(args.out)
+    if not target.exists():
+        target = target.parent if target.parent.exists() else Path.cwd()
+    stage = "full_run" if args.confirm_full_run else "install"
+    result = enforce(stage, target)
+    print(
+        f"portão {result['stage']} {result['reason']}  "
+        f"livre {result['free_bytes'] / 1024**3:.1f} GiB"
+    )
+    if not result["ok"]:
+        return 2
+    return 0
+
+
 def cmd_run(args: argparse.Namespace) -> int:
+    gated = _gate(args)
+    if gated != 0:
+        return gated
     smoke_path = Path(args.out) / "smoke.json"
     if not args.confirm_full_run:
         args.out = str(smoke_path)
@@ -404,15 +427,17 @@ def _leia() -> str:
         "Não há CSV, peso, oof.csv nem modelo.joblib.\n"
         "Código do pacote tabpfn é Apache-2.0. O peso v2 é priorlabs-1-1.\n"
         f"Fetch sem token. {HF_FILE_URL}\n"
-        "1. cd experiments/tabpfn && uv sync\n"
-        "2. uv run tabpfn-exp fetch --dest weights\n"
-        "3. uv run --offline tabpfn-exp run --weights weights/"
+        "Não use /opt/homebrew/bin/python3 (3.15). O arquivo .python-version pede 3.12.\n"
+        "1. python3 experiments/tabpfn/preflight.py\n"
+        "2. cd experiments/tabpfn && UV_CACHE_DIR=\"$PWD/.uv-cache\" uv sync\n"
+        "3. UV_CACHE_DIR=\"$PWD/.uv-cache\" uv run tabpfn-exp fetch --dest weights\n"
+        "4. UV_CACHE_DIR=\"$PWD/.uv-cache\" uv run --offline tabpfn-exp run --weights weights/"
         f"{WEIGHT_FILENAME} --out runs/oficial "
         "--data ../../data/final_treino_val.csv\n"
-        "4. Isso para no smoke. Leia runs/oficial/smoke.json.\n"
-        "5. Só então repita o comando com --confirm-full-run.\n"
-        "Opcional, oof local, sem upload:\n"
-        "   uv run --project . desfecho train --data data/final_treino_val.csv --out /tmp/baseline-local\n"
+        "5. Isso para no smoke. Leia runs/oficial/smoke.json.\n"
+        "6. Só então repita o comando com --confirm-full-run.\n"
+        "Opcional, oof local, sem upload, depois do sync:\n"
+        "   .venv/bin/desfecho train --data ../../data/final_treino_val.csv --out /tmp/baseline-local\n"
         "   e passe --baseline-oof /tmp/baseline-local/oof.csv\n"
         "Retomar um fit interrompido é o mesmo comando com --confirm-full-run.\n"
         f"Licença do código {CODE_LICENSE}. Licença do peso {WEIGHT_LICENSE} {WEIGHT_LICENSE_URL}.\n"

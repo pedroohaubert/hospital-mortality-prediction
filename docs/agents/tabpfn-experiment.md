@@ -31,7 +31,11 @@ Checked from the PyPI metadata, the 9.2.0 wheel, and the Hugging Face model card
 
 ## Commands
 
-From `experiments/tabpfn`, after `uv sync`:
+The system Python is 3.15.2 and must not be the venv. `experiments/tabpfn/.python-version` is 3.12 and `requires-python` is `>=3.12,<3.13`. `uv sync` downloads that interpreter into uv's own directory. It does not replace Homebrew Python.
+
+Install peak used by the gate is 2 GiB. That is four times the macOS arm64 wheel sum in the lock (about 350 MB, torch 2.14.1 cp312 macosx_14_0_arm64 is 127 MB) plus a managed CPython. It is not a measured install on the Mac. The gate also keeps 5 GiB free. A full run also wants at least 6 GiB available on a machine with at least 15 GiB of RAM. Set `UV_CACHE_DIR` to `experiments/tabpfn/.uv-cache` so the download does not use the global cache.
+
+From the unpacked root, after `python3 experiments/tabpfn/preflight.py` and `uv sync` inside `experiments/tabpfn`:
 
 ```bash
 uv run tabpfn-exp fetch --dest weights

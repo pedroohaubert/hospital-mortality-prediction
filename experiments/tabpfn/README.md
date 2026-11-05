@@ -24,18 +24,25 @@ O pacote tem tratamento de MPS, inclusive erro de memória. Isso não mede este 
 
 ## Comando no Mac
 
-Na raiz do repositório, com o CSV em `data/final_treino_val.csv` e rede só no `fetch`.
+O `python3` do Homebrew é 3.15.2. Torch 2.14.1 não tem roda para ele. O `.python-version` pede 3.12, e o `uv sync` baixa esse interpretador para a pasta do próprio uv. Isso não troca o Python do sistema.
+
+Há cerca de 14 GiB livres e o piso é deixar 5 GiB. O pico previsto da instalação é 2 GiB. Esse 2 GiB não foi medido neste Mac. É quatro vezes a soma das wheels arm64 do lock, cerca de 350 MB, mais o CPython gerenciado. O cache do uv fica em `experiments/tabpfn/.uv-cache`, não no cache global.
 
 ```bash
+mkdir -p "$HOME/Projetos"
+unzip tabpfn-exp-handoff.zip -d "$HOME/Projetos/eramia-tabpfn-experiment"
+cd "$HOME/Projetos/eramia-tabpfn-experiment"
+/opt/homebrew/bin/python3 experiments/tabpfn/preflight.py
 cd experiments/tabpfn
-uv sync
-uv run tabpfn-exp fetch --dest weights
-uv run --offline tabpfn-exp run \
+UV_CACHE_DIR="$PWD/.uv-cache" "$HOME/.local/bin/uv" sync
+UV_CACHE_DIR="$PWD/.uv-cache" "$HOME/.local/bin/uv" run tabpfn-exp fetch --dest weights
+UV_CACHE_DIR="$PWD/.uv-cache" "$HOME/.local/bin/uv" run --offline tabpfn-exp run \
   --weights weights/tabpfn-v2-classifier-finetuned-zk73skhh.ckpt \
   --out runs/oficial \
-  --data ../../data/final_treino_val.csv \
-  --baseline-oof ../../artifacts/oof.csv
+  --data /CAMINHO/final_treino_val.csv
 ```
+
+O `run` sem `--confirm-full-run` só faz o smoke. Ele para se o disco livre ficar abaixo de 5 GiB mais o pico, ou, no fit cheio, se a RAM disponível ficar abaixo de 6 GiB numa máquina de 16 GiB. Não apaga arquivo nenhum.
 
 Esse `run` faz o smoke, grava `runs/oficial/smoke.json` e para. O JSON traz o device que de fato passou no fit minúsculo, o tempo, o pico de RSS e uma projeção linear das 25 idas. A projeção não é medição. A memória do fold cheio fica sem número.
 
